@@ -71,7 +71,44 @@ public class ParkiranImpl implements ParkiranService {
 
 	@Override
 	public Boolean valid(Parkiran parkir) throws Exception {
-		return parkirDao.valid(parkir);
+		Parkiran par = null;
+		try {
+			par = (Parkiran) parkirDao.valid(parkir);
+		} catch (Exception e) {
+		}
+		if (parkir.getNoPlat().replaceAll("\\s+", "").toLowerCase().length() > 8) {
+			if (parkir.getNoPlat().replaceAll("\\s+", "").toLowerCase().substring(0, 1).equalsIgnoreCase("b")) {
+				try {
+					Integer.parseInt(parkir.getNoPlat().substring(1, 5));
+					if (parkir.getNoPlat().substring(1, 5).length() > 4
+							&& parkir.getNoPlat().substring(1, 5).length() >= 1) {
+						try {
+							Integer.parseInt(parkir.getNoPlat().substring(5, 8));
+							return false;
+						} catch (Exception e) {
+							if (par != null) {
+								if (par.getNoPlat().toLowerCase().equals(parkir.getNoPlat().toLowerCase())
+										&& par.getTanggalMasuk().equals(parkir.getTanggalMasuk())) {
+									return false;
+								} else {
+									return true;
+								}
+							} else {
+								return false;
+							}
+						}
+					} else {
+						return false;
+					}
+				} catch (Exception e) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	@Override

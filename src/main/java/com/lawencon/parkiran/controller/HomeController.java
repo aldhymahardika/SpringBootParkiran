@@ -7,6 +7,7 @@ package com.lawencon.parkiran.controller;
  */
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,24 @@ import com.lawencon.parkiran.model.Parkiran;
 import com.lawencon.parkiran.service.ParkiranService;
 
 @RestController
-public class HomeController {
+public class HomeController extends BaseController {
 
 	@Autowired
 	private ParkiranService parkirService;
-
+	
+	@Override
+	String authUser(String user) throws Exception {
+		byte[] decodeBytes = Base64.getDecoder().decode(user);
+		String decodeString = new String(decodeBytes);
+		return decodeString;
+	}
+	
 	@GetMapping("/home")
-	public ResponseEntity<List<Parkiran>> getHome(@RequestHeader("username") String username,
-			@RequestHeader("password") String password) {
+	public ResponseEntity<List<Parkiran>> getHome(@RequestHeader("Authorization") String user) {
 		List<Parkiran> listParkir = new ArrayList<>();
 		try {
-			listParkir = parkirService.findAll(username, password);
+			String[] auth = authUser(user).split(":");
+			listParkir = parkirService.findAll(auth[0], auth[1]);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(listParkir, HttpStatus.BAD_REQUEST);
@@ -44,10 +52,11 @@ public class HomeController {
 
 	@GetMapping("/home/")
 	public ResponseEntity<List<Parkiran>> getJenis(@RequestParam("jenisKendaraan") String jenis,
-			@RequestHeader("username") String username, @RequestHeader("password") String password) {
+			@RequestHeader("Authorization") String user) {
 		List<Parkiran> listParkir = new ArrayList<>();
 		try {
-			listParkir = parkirService.findByJenisKendaraan(jenis, username, password);
+			String[] auth = authUser(user).split(":");
+			listParkir = parkirService.findByJenisKendaraan(jenis, auth[0], auth[1]);
 		} catch (Exception e) {
 			return new ResponseEntity<>(listParkir, HttpStatus.BAD_REQUEST);
 		}
@@ -55,11 +64,11 @@ public class HomeController {
 	}
 
 	@GetMapping("/home/checkout")
-	public ResponseEntity<List<Parkiran>> getCheckout(@RequestHeader("username") String username,
-			@RequestHeader("password") String password) {
+	public ResponseEntity<List<Parkiran>> getCheckout(@RequestHeader("Authorization") String user) {
 		List<Parkiran> listParkir = new ArrayList<>();
 		try {
-			listParkir = parkirService.findByTanggalKeluar(username, password);
+			String[] auth = authUser(user).split(":");
+			listParkir = parkirService.findByTanggalKeluar(auth[0], auth[1]);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(listParkir, HttpStatus.BAD_REQUEST);
@@ -68,11 +77,11 @@ public class HomeController {
 	}
 
 	@PostMapping("/checkin")
-	public ResponseEntity<?> getInsert(@RequestBody String content, @RequestHeader("username") String username,
-			@RequestHeader("password") String password) {
+	public ResponseEntity<?> getInsert(@RequestBody String content, @RequestHeader("Authorization") String user) {
 		try {
+			String[] auth = authUser(user).split(":");
 			Parkiran p = new ObjectMapper().readValue(content, Parkiran.class);
-			parkirService.insert(p, username, password);
+			parkirService.insert(p, auth[0], auth[1]);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>("Gagal", HttpStatus.BAD_REQUEST);
@@ -82,10 +91,10 @@ public class HomeController {
 
 	@PostMapping("/checkout")
 	public ResponseEntity<String> updateHiber(@RequestParam("id") int id,
-			@RequestParam("tanggalKeluar") String tanggal_keluar, @RequestHeader("username") String username,
-			@RequestHeader("password") String password) {
+			@RequestParam("tanggalKeluar") String tanggal_keluar, @RequestHeader("Authorization") String user) {
 		try {
-			parkirService.update(id, tanggal_keluar, username, password);
+			String[] auth = authUser(user).split(":");
+			parkirService.update(id, tanggal_keluar, auth[0], auth[1]);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>("Gagal.", HttpStatus.BAD_REQUEST);

@@ -32,9 +32,8 @@ public class ParkiranImpl implements ParkiranDao {
 	}
 
 	@Override
-	public Boolean valid(Parkiran parkir) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Parkiran> valid(Parkiran parkir) throws Exception {
+		return parkirRepo.valid(parkir.getNoPlat());
 	}
 
 	@Override
