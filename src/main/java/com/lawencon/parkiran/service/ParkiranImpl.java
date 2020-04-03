@@ -34,7 +34,7 @@ public class ParkiranImpl implements ParkiranService {
 
 	@Override
 	public Parkiran insert(Parkiran parkir, String username, String password) throws Exception {
-		if (loginService.findByUsernameAndPassword(username, password) == false) {
+		if (loginService.findByUsernameAndPassword(username, password) == true) {
 			if (valid(parkir) == false) {
 				System.out.println("gagal insert");
 				return null;

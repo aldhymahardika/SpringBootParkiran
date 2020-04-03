@@ -48,10 +48,10 @@ public class HomeController {
 		List<Parkiran> listParkir = new ArrayList<>();
 		try {
 			listParkir = parkirService.findByJenisKendaraan(jenis, username, password);
-			return new ResponseEntity<>(listParkir, HttpStatus.UNAUTHORIZED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(listParkir, HttpStatus.BAD_REQUEST);
 		}
+		return new ResponseEntity<>(listParkir, HttpStatus.OK);
 	}
 
 	@GetMapping("/home/checkout")
@@ -86,11 +86,11 @@ public class HomeController {
 			@RequestHeader("password") String password) {
 		try {
 			parkirService.update(id, tanggal_keluar, username, password);
-			return new ResponseEntity<>("Berhasil", HttpStatus.UNAUTHORIZED);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>("Gagal.", HttpStatus.BAD_REQUEST);
 		}
+		return new ResponseEntity<>("Berhasil", HttpStatus.OK);
 	}
 
 }
